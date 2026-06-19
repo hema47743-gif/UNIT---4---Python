@@ -1,0 +1,83 @@
+import csv
+import os
+FILE = "store_inventory.csv"
+if not os.path.exists(FILE):
+    with open(FILE, "w", newline="") as f:
+        csv.writer(f).writerow(["ID", "Name", "Category", "Qty", "Price"])
+def add_item():
+    with open(FILE, "a", newline="") as f:
+        w = csv.writer(f)
+        pid = input("Item ID: ")
+        name = input("Item Name: ")
+        cat = input("Category: ")
+        qty = int(input("Quantity: "))
+        price = float(input("Price: "))
+        w.writerow([pid, name, cat, qty, price])
+        print("Item Added")
+def display():
+    print("\nInventory List")
+    with open(FILE, "r") as f:
+        for row in csv.reader(f):
+            print(row)
+def search():
+    name = input("Enter item name: ").lower()
+    found = False
+    with open(FILE, "r") as f:
+        for row in csv.reader(f):
+            if name in row[1].lower():
+                print("Found:", row)
+                found = True
+    if not found:
+        print("Item not found")
+def update():
+    pid = input("Enter Item ID: ")
+    rows, found = [], False
+    with open(FILE, "r") as f:
+        for row in csv.reader(f):
+            if row[0] == pid:
+                row[3] = input("New Quantity: ")
+                row[4] = input("New Price: ")
+                found = True
+            rows.append(row)
+    with open(FILE, "w", newline="") as f:
+        csv.writer(f).writerows(rows)
+    print("Updated" if found else "Item not found")
+def total_value():
+    total = 0
+    with open(FILE, "r") as f:
+        next(f)  # skip header
+        for row in csv.reader(f):
+            total += int(row[3]) * float(row[4])
+    print("Total Inventory Value:", total)
+def delete():
+    pid = input("Enter Item ID: ")
+    rows, found = [], False
+    with open(FILE, "r") as f:
+        for row in csv.reader(f):
+            if row[0] != pid:
+                rows.append(row)
+            else:
+                found = True
+    with open(FILE, "w", newline="") as f:
+        csv.writer(f).writerows(rows)
+
+    print("Deleted" if found else "Item not found")
+while True:
+    print("\n1.Add Item 2.Display 3.Search 4.Update 5.Total Value 6.Delete 7.Exit")
+    ch = input("Enter choice: ")
+    if ch == "1":
+        add_item()
+    elif ch == "2":
+        display()
+    elif ch == "3":
+        search()
+    elif ch == "4":
+        update()
+    elif ch == "5":
+        total_value()
+    elif ch == "6":
+        delete()
+    elif ch == "7":
+        break
+    else:
+        print("Invalid choice")
